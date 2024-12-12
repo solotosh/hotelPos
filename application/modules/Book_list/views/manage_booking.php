@@ -100,15 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kaya Hotel :: Add Booking</title>
     <!-- Include CSS files -->
-    <link rel="stylesheet" href="http://127.0.0.1/hotel/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://127.0.0.1/hotel/assets/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://127.0.0.1/hotel/assets/css/custom.min.css">
+    <link rel="stylesheet" href="<?php echo base_url('assets/css/bootstrap.min.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('assets/css/font-awesome.min.css'); ?>">
+    <link rel="stylesheet" href="<?php echo base_url('assets/css/custom.min.css'); ?>">
     <!-- Additional CSS files -->
-    <link rel="stylesheet" href="http://127.0.0.1/hotel/assets/css/style.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="<?php echo base_url('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <!-- Add Select2 for better dropdowns -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<!-- Include Font Awesome for Icons (if not already included) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
     <style>
@@ -154,33 +157,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .datepicker {
             border-radius: 4px;
         }
-        /* Add loading spinner */
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.8);
-            z-index: 9999;
-        }
-        .loading-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+       
+        
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
     <!-- Add loading spinner -->
-    <div class="loading">
+    <!-- <div class="loading">
         <div class="loading-spinner">
             <i class="fa fa-spinner fa-spin fa-3x"></i>
         </div>
-    </div>
+    </div> -->
 
     <div class="wrapper">
         <!-- Header -->
@@ -215,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </ul>
                 </div>
             </nav> -->
+       
         </header>
 
         <!-- Sidebar -->
@@ -222,7 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="sidebar">
                 <ul class="sidebar-menu">
                     <li class="treeview">
-                        <a href="http://127.0.0.1/hotel/dashboard/home"><i class="ti-home"></i> <span>Dashboard</span></a>
+                    <a href="<?php echo base_url('dashboard/home'); ?>">Home</a>
+                    <i class="ti-home"></i> <span>Dashboard</span></a>
                     </li>
                 </ul>
             </div>
@@ -230,13 +220,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <section class="content-header">
-                <div class="header-icon"><i class="pe-7s-note2"></i></div>
-                <div class="header-title">
-                    <h1>Customer  Booking</h1>
-                    <small>Add New Booking</small>
-                </div>
-            </section>
+        <section class="content-header">
+    <div class="header-icon">
+        <i class="pe-7s-note2"></i>
+    </div>
+    <?php if ($this->session->flashdata('error_message')): ?>
+        <div style="color: red; text-align: center; margin-top: 10px;">
+            <?php echo $this->session->flashdata('error_message'); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->session->flashdata('success_message')): ?>
+        <div style="color: green; text-align: center; margin-top: 10px;">
+            <?php echo $this->session->flashdata('success_message'); ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="header-title">
+        <small>Add New Booking</small>
+    </div>
+</section>
+
 
             <!-- Main content -->
             <div class="content">
@@ -336,8 +340,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
 
                                         <div class="form-group">
-                                            <!-- <label class="">Actual Price</label>
-                                            <span class="text-success">0</span> -->
+                                        <label class="required">Number of Guest</label>
+                                        <input type="number" class="form-control" name="persons" required min="1" max="10" id="number_of_persons" >
                                         </div>
                                             </div>
                                          
@@ -350,8 +354,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <div class="form-section">
                                                 <h5 class="section-title">Additional Details</h5>
                                                 <div class="form-group">
-                                                    <label class="required">Number of Guest</label>
-                                                    <input type="number" class="form-control" name="persons" required min="1" max="10" id="number_of_persons" >
+                                                    
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Number of Children</label>
@@ -364,16 +367,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </div>
                                                 <div class="form-group">
-                                                    <label class="required">Amount</label>
+                                                    <label class="required">Amount Ksh</label>
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
-                                                            <span class="input-group-text">Ksh</span>
+                                                            <span class="input-group-text"></span>
                                                         </div>
                                                         <input type="number" class="form-control" id="actual_price" name="actual_price" required min="0" step="0.01" >
                                                         <input type="hidden" id="price_per_room" value="1000"> <!-- Replace 1000 with the actual price per room -->
                                                     </div>
                                                 </div>
-                                                
+
+                                                <div class="form-group">
+    <label for="paymentMethod" class="required">Payment Method</label>
+    <select id="paymentMethod" class="form-control select2">
+        <option value="">Select Payment Method</option>
+        <option value="mpesa">M-Pesa</option>
+        <option value="cash">Cash</option>
+        <option value="bank">Bank</option>
+    </select>
+</div>
+
+<div class="form-group" id="mpesaDetails" style="display: none;">
+    <label for="mpesaCode">Enter M-Pesa CODE:</label>
+    <input type="text" id="mpesaCode" class="form-control" name="mpesaCode" placeholder="Enter M-Pesa CODE"><br>
+    <button type="button" class="btn btn-success btn-sm" id="verifyMpesa">Verify M-Pesa Details</button>
+    <div id="mpesaResponse"></div>
+</div>
+
+
+
+
+                                                   
+                                                </div>
                                                 
                                             </div>
                                         </div>
@@ -384,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="col-12">
                                             <div class="form-section">
                                                 <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label class="required">Payment Status</label>
                                                             <select class="form-control select2" id="payment_status" name="payment_status" required>
@@ -393,7 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label class="required">Booking Type</label>
                                                             <select class="form-control select2" id="booking_type" name="booking_type" required>
@@ -404,25 +429,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                    
 
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <label class="required">Payment Method</label>
-                                                            <select class="form-control select2" name="payment_method" required>
-                                                                <option value="">Select Payment Method</option>
-                                                                <option value="Cash">Cash</option>
-                                                                <option value="Card">Credit/Debit Card</option>
-                                                                <option value="M-Pesa">M-Pesa</option>
-                                                                <option value="Bank">Bank Transfer</option>
-                                                            </select>
-                                                            <!-- Button to trigger modal -->
-                                                            
-                                                        </div>
-                                                    </div> 
+                                                   
+                                    
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
+
+
 
                                     <div class="row mt-4">
                                         <div class="col-12 text-center">
@@ -444,31 +456,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Kaya Road
             </div>
             <strong>Kaya Hotel You belong Here 2024</strong>
-            <a href="http://127.0.0.1/hotel/dashboard/user/form">Kaya Hotel</a>
+            < href="<?php echo base_url('dashboard/user/form'); ?>">
+            User Form</a>
+            Kaya Hotel</a>
         </footer>
     </div>
 
     <!-- Include JS files -->
-    <script src="http://127.0.0.1/hotel/assets/js/jquery-1.12.4.min.js"></script>
-    <script src="http://127.0.0.1/hotel/assets/js/bootstrap.min.js"></script>
-    <script src="http://127.0.0.1/hotel/assets/js/toastr.min.js"></script>
+ 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-    <script>
-    // Initialize Select2
-    $(document).ready(function() {
-        $('.select2').select2();
+
+<script>
+   
+   $(document).ready(function () {
+    // Initially hide the M-Pesa details
+    $("#mpesaDetails").hide();
+
+    // Show or hide M-Pesa section based on payment method selection
+    $('#paymentMethod').change(function () {
+        var selectedMethod = $(this).val();
+
+        if (selectedMethod === 'mpesa') {
+            $('#mpesaDetails').slideDown(); // Show M-Pesa details
+        } else {
+            $('#mpesaDetails').slideUp(); // Hide M-Pesa details
+        }
     });
+
+    // Handle M-Pesa verification
+    $('#verifyMpesa').click(function () {
+        var mpesaCode = $('#mpesaCode').val(); // Get the M-Pesa code entered
+
+        if (!mpesaCode) {
+            alert('Please enter your M-Pesa code.');
+            return;
+        }
+
+        // Show a spinner while verifying (optional)
+        var spinner = $('<div class="spinner">Verifying...</div>'); 
+        $('#mpesaResponse').html(spinner);
+
+        // Simulate M-Pesa verification (this should be replaced with your actual verification logic)
+        setTimeout(function () {
+            if (mpesaCode === "SLB919KF5T") { // Simulated valid code (replace with real verification)
+                // Successful verification - Show green tick and success message
+                $('#mpesaResponse').html('<p class="success"><i class="fas fa-check-circle" style="color: green;"></i> M-Pesa verification successful!</p>');
+
+                // Change payment status to 'Paid' (value 1)
+                $('#payment_status').val('1'); // Update payment status to 'Paid'
+
+            } else {
+                // Failed verification - Show red cross and error message
+                $('#mpesaResponse').html('<p class="error"><i class="fas fa-times-circle" style="color: red;"></i> Invalid M-Pesa code. Please Let The Client Provide The Correct Code.</p>');
+            }
+        }, 3000); // Simulating a 3-second verification delay
+    });
+});
+
+       
+
+
+
+
 </script>
 
 
 
 
-   
-   
-
-<script>
+    <script>
     $(document).ready(function () {
         
         function calculateTotalNights() {
@@ -490,58 +549,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Trigger calculation when dates change
         $('input[name="check_in"], input[name="check_out"]').on('change', calculateTotalNights);
     });
-</script>
+    </script>
 
-<script>
-function fetchRoomAvailability() {
-    var roomId = $('#room_id').val();
-
-    $.ajax({
-        url: '<?php echo site_url("Book_list/Booking_List/fetch_available_room_status"); ?>',
-        method: 'POST',
-        data: { room_id: roomId },
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                $('#available_rooms').val(response.available_rooms);
-            } else {
-                $('#available_rooms').val(0);
-                alert('This room is currently unavailable!');
-            }
-        },
-        error: function() {
-            alert('An error occurred while fetching room availability.');
-        }
-    });
-}
-
-</script>
-
-<!-- Modal for Payment Method -->
-<div class="modal fade" id="paymentMethodModal" tabindex="-1" role="dialog" aria-labelledby="paymentMethodModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentMethodModalLabel">Payment Method Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Select a payment method from the dropdown. Here are some details about each option:</p>
-                <ul>
-                    <li><strong>Cash:</strong> Pay at the hotel upon arrival.</li>
-                    <li><strong>Credit/Debit Card:</strong> Secure online payment.</li>
-                    <li><strong>M-Pesa:</strong> Mobile money transfer service.</li>
-                    <li><strong>Bank Transfer:</strong> Direct bank transfer.</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+   
 </body>
 </html>

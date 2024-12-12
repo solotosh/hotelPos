@@ -124,7 +124,8 @@
                                                 <?php foreach ($rooms as $room): ?>
                                                     <tr>
                                                         <td><?php echo $room->room_number; ?></td>
-                                                        <td><?php echo $room->price; ?></td>
+                                                       
+                                                        
                                                         <td><?php echo $room->room_type; ?></td>
                                                         
                                                        

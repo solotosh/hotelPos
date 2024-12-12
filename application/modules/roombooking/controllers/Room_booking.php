@@ -90,7 +90,7 @@ class Room_booking extends MX_Controller {
     // Retrieve input data
     $room_id = $this->input->post('room_id'); // Ensure 'room_id' is in your form
     $room_number = $this->input->post('room_number');
-    $price = $this->input->post('price');
+   
     $room_type_id = $this->input->post('type'); // This is now the ID for the type
     $total_adult = $this->input->post('total_adult');
     $total_child = $this->input->post('total_child');
@@ -100,7 +100,7 @@ class Room_booking extends MX_Controller {
     // Prepare data for update
     $data = array(
         'room_number' => $room_number,
-        'price' => $price,
+    
         'type_id' => $room_type_id, // Update type as type_id
         'total_adult' => $total_adult,
         'total_child' => $total_child,
@@ -144,7 +144,7 @@ public function delete_room($room_id) {
 
     public function edit_room($room_id)
 {
-    // Load the model
+
     $this->load->model('Room_model');
     
     // Fetch the room data from the database using the ID
@@ -155,11 +155,11 @@ public function delete_room($room_id) {
         $this->session->set_flashdata('error', 'Room not found');
         redirect('roombooking');
     }
+
+
     
-    // Fetch room types if necessary (assuming you're passing room types)
     $room_types = $this->Room_model->get_all_room_types();
 
-    // Pass the room and room types to the view
     $data['room'] = $room;
     $data['room_types'] = $room_types;
 

@@ -112,7 +112,7 @@ public function get_all_room_types() {
             $this->db->select('
                 rooms.id, 
                 rooms.room_number, 
-                rooms.price, 
+             
              
                 room_types.name AS room_type, 
                 

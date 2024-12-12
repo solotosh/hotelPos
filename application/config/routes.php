@@ -131,6 +131,7 @@ $route['checkout/checkout/(:num)'] = 'checkout/RoomCheck/confirm_checkout/$1';
 $route['checkout/view/(:num)'] = 'checkout/view/$1';
 
 $route['book_list/Booking_List/save_booking'] = 'book_list/Booking_List/save_booking';
+$route['manage_booking'] = 'Book_list/Booking_List/manage_booking';
 
 
 

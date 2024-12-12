@@ -21,7 +21,7 @@ class Booking_model extends CI_Model {
             customer_info.id_number,
             customer_info.phone_number,
             room_types.name as room_type,
-            customer_info.customer_name,
+            customer_info.customer_name
         ');
         $this->db->from('bookings');
         $this->db->join('customer_info', 'bookings.customer_id = customer_info.customer_id', 'left');
@@ -38,8 +38,7 @@ class Booking_model extends CI_Model {
         // Debug the query if needed:
         // echo $this->db->last_query(); 
         
-        echo $CI->db->last_query();
-        exit;
+        return $query->result();
     }
     
     
@@ -129,7 +128,22 @@ public function update_booking($id, $data) {
     return $this->db->affected_rows();
 }
 
+public function more() {
+    $CI =& get_instance();
+    $CI->load->database();
 
+    // Load any necessary models or data
+    $data['bookings'] = $CI->db->select('bookings.*, room_types.name as room_type, customer_info.customer_name')
+        ->from('bookings')
+        ->join('room_types', 'bookings.room_type_id = room_types.id', 'left')
+        ->join('customer_info', 'bookings.customer_id = customer_info.customer_id', 'left')
+        ->order_by('bookings.created_at', 'DESC')
+        ->get()
+        ->result();
+
+    // Ensure the 'more' view exists
+    $this->load->view('more', $data);
+}
 
 
 }

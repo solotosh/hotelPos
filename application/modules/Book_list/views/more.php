@@ -208,7 +208,9 @@ foreach ($room_types as $room_type) {
     
 
 </div>
-                    <a href="<?php echo site_url('roombooking/add_booking'); ?>" class="btn btn-primary mb-3">Add Booking</a>
+<a href="<?php echo site_url('roombooking/add_booking'); ?>" class="btn btn-primary btn-lg mr-2" style="font-size: 1.5rem; padding: 15px 30px; margin-top: -15px;">Add Booking</a>
+
+
                     <a href="<?php echo site_url('roomlist/roomlist'); ?>" class="btn btn-success mb-3">View RoomList</a>
                     <small>Manage Bookings</small>
                 </div>

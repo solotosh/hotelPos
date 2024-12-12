@@ -78,11 +78,11 @@
         value="<?php echo $room['room_number']; ?>" readonly /> 
     
       
-      
+<!--       
             <div>
                 <label for="price">Price:</label>
-                <input type="number" name="price" value="<?php echo $room['price']; ?>" required />
-            </div>
+                <input type="number" name="price" value="" required />
+            </div> -->
 
 
           <div> 

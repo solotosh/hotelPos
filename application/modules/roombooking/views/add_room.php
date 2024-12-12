@@ -74,10 +74,10 @@
     
       
       
-            <div>
+            <!-- <div>
                 <label for="price">Price:</label>
                 <input type="number" name="price" required />
-            </div>
+            </div> -->
             <div> <label for="type">Room Type:</label> <select name="type" required> <!-- Loop through the room_types array to populate the dropdown --> <?php foreach ($room_types as $type): ?>
                  <option value="<?php echo $type->id; ?>">
                     <?php echo $type->name; ?>

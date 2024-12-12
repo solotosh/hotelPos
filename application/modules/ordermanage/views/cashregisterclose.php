@@ -55,7 +55,7 @@
                   <div class="form-group row">
                     <label for="4digit" class="col-sm-4 col-form-label"><?php echo display('notes');?></label>
                     <div class="col-sm-7">
-                      <textarea id="closingnote" class="form-control" name="closingnote" cols="30" rows="3" placeholder="<?php echo display('closing_note'); ?>"></textarea>
+                      <textarea id="closingnote" class="form-control" name="closingnote" cols="30" rows="3" placeholder="<?php echo display('Summary of The'); ?>"></textarea>
                     </div>
                   </div>
                   <div class="form-group text-right">

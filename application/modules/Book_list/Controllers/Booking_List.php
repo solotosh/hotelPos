@@ -8,6 +8,7 @@ class Booking_List extends MX_Controller {
         //$this->load->model('Booking_model');
         $this->load->helper('form');  
         $this->load->library('session');
+        $this->load->helper('url');  
     }
 
     public function index() {
@@ -191,8 +192,8 @@ public function save_booking() {
     // Validate required inputs
     if (empty($data['room_id']) || empty($data['persons']) || empty($data['check_in']) || empty($data['check_out']) || 
         empty($data['number_of_rooms']) || empty($data['customer_name']) || empty($data['phone_number'])) {
-        $data['error_message'] = 'All required fields must be filled.';
-        $this->load->view('more', $data);
+            $CI->session->set_flashdata('error_message', 'All required fields must be filled.');
+            redirect('manage_booking'); //
         return;
     }
 
@@ -255,8 +256,8 @@ public function save_booking() {
         ->row();
 
     if (!$room_type) {
-        $data['error_message'] = 'Invalid Room Type Selected.';
-        $this->load->view('more', $data);
+      $CI->session->set_flashdata('Invalid Room Type Selected');
+      redirect('manage_booking');
         return;
     }
 
@@ -281,8 +282,8 @@ public function save_booking() {
         ->row()->number_of_rooms ?? 0;
 
     if ($max_occupancy - $booked_rooms < $number_of_rooms) {
-        $data['error_message'] = 'Not Enough Rooms Available.';
-        $this->load->view('more', $data);
+       $CI->session->set_flashdata('No Room Availabe For  that Type......Select A Different One');
+      redirect('manage_booking');
         return;
     }
 
@@ -311,7 +312,13 @@ public function save_booking() {
     ];
     $CI->db->insert('bookings', $booking_data);
     $booking_id = $CI->db->insert_id();
-
+    if ($CI->db->trans_status() === FALSE) {
+        // If there's an error, set an error message
+        $CI->session->set_flashdata('error_message', 'An error occurred while saving the booking.');
+    } else {
+        // If successful, set a success message
+        $CI->session->set_flashdata('success_message', 'Booking successfully created for ' . $data['customer_name']);
+    }
   
 
 
@@ -344,19 +351,202 @@ public function save_booking() {
             ->get()
             ->result();
 
-        // Load the view with updated data
-        $this->load->view('more', $data);
+       
+       redirect('manage_booking');
     }
 }
 
 
 
+    public function manage_booking() {
+        // Fetch bookings with customer name and room type
+        $data['bookings'] = $this->db->select('
+                bookings.id,
+                bookings.check_in,
+                bookings.check_out,
+                bookings.number_of_rooms,
+                bookings.total_nights,
+                bookings.actual_price,
+                bookings.total_price,
+                bookings.subtotal,
+                bookings.payment_method,
+                bookings.id_number,
+                bookings.status,
+                room_types.name as room_type,
+                customer_info.customer_name')
+            ->from('bookings')
+            ->join('room_types', 'bookings.room_type_id = room_types.id', 'left')
+            ->join('customer_info', 'bookings.customer_id = customer_info.customer_id', 'left')
+            ->order_by('bookings.created_at', 'DESC')
+            ->get()
+            ->result();
 
+        // Load the view
+        $this->load->view('manage_booking', $data);
+    }
 
+    public function save3_booking() {
+        // Retrieve POST data
+        $post_data = $this->input->post();
 
+        // Validate required inputs
+        if (empty($post_data['room_id']) || empty($post_data['persons']) || empty($post_data['check_in']) || empty($post_data['check_out']) || 
+            empty($post_data['number_of_rooms']) || empty($post_data['customer_name']) || empty($post_data['phone_number'])) {
+            $this->session->set_flashdata('error_message', 'All required fields must be filled.');
+            redirect('Book_list/manage_booking'); // Correctly formatted redirect
+            return;
+        }
 
+        // Extract input data
+        $room_type_id = $post_data['room_id'];
+        $persons = $post_data['persons'];
+        $child_count = $post_data['child_count'] ?? 0;
+        $number_of_rooms = $post_data['number_of_rooms'];
+        $check_in = $post_data['check_in'];
+        $check_out = $post_data['check_out'];
+        $customer_email = $post_data['customer_email'] ?? '';  // Optional
+        $customer_name = $post_data['customer_name'];
+        $phone_number = $post_data['phone_number'];
+        $payment_method = $post_data['payment_method'] ?? 'Cash';
+        $booking_type = $post_data['booking_type'] ?? 'Instant';
+        $id_number = $post_data['id_number'] ?? '';  // Optional
+        $payment_status = $post_data['payment_status'];
 
+        // Initialize or fetch customer ID
+        $customer_id = null;
+        if (!empty($customer_email)) {
+            // Lookup customer by email
+            $customer = $this->db->select('customer_id')
+                ->from('customer_info')
+                ->where('customer_email', $customer_email)
+                ->get()
+                ->row();
 
+            if ($customer) {
+                $customer_id = $customer->customer_id;
+            } else {
+                // Insert new customer record
+                $customer_data = [
+                    'customer_email' => $customer_email,
+                    'customer_name' => $customer_name,
+                    'phone_number' => $phone_number,
+                    'id_number' => $id_number,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $this->db->insert('customer_info', $customer_data);
+                $customer_id = $this->db->insert_id();
+            }
+        } else {
+            // Insert customer without email
+            $customer_data = [
+                'customer_name' => $customer_name,
+                'phone_number' => $phone_number,
+                'id_number' => $id_number,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $this->db->insert('customer_info', $customer_data);
+            $customer_id = $this->db->insert_id();
+        }
+
+        // Fetch room type details
+        $room_type = $this->db->select('price_per_night, max_occupancy')
+            ->from('room_types')
+            ->where('id', $room_type_id)
+            ->get()
+            ->row();
+
+        if (!$room_type) {
+            $this->session->set_flashdata('error_message', 'Invalid Room Type Selected.');
+            redirect('Book_list/manage_booking');
+            return;
+        }
+
+        $price_per_night = $room_type->price_per_night;
+        $max_occupancy = $room_type->max_occupancy;
+
+        // Calculate booking details
+        $check_in_date = new DateTime($check_in);
+        $check_out_date = new DateTime($check_out);
+        $total_nights = $check_in_date->diff($check_out_date)->days;
+
+        $subtotal = $price_per_night * $number_of_rooms * $total_nights;
+        $total_price = $subtotal;
+
+        // Check room availability
+        $booked_rooms = $this->db->select_sum('number_of_rooms')
+            ->from('bookings')
+            ->where('room_type_id', $room_type_id)
+            ->where('check_in <=', $check_out)
+            ->where('check_out >=', $check_in)
+            ->get()
+            ->row()->number_of_rooms ?? 0;
+
+        if (($max_occupancy - $booked_rooms) < $number_of_rooms) {
+            $this->session->set_flashdata('error_message', 'Not Enough Rooms Available.');
+            redirect('Book_list/manage_booking');
+            return;
+        }
+
+        // Begin transaction
+        $this->db->trans_start();
+
+        // Insert booking record
+        $booking_data = [
+            'customer_id' => $customer_id,
+            'room_type_id' => $room_type_id,
+            'check_in' => $check_in,
+            'check_out' => $check_out,
+            'persons' => $persons,
+            'child_count' => $child_count,
+            'number_of_rooms' => $number_of_rooms,
+            'total_nights' => $total_nights,
+            'subtotal' => $subtotal,
+            'total_price' => $total_price,
+            'phone_number' => $phone_number,
+            'customer_email' => $customer_email,
+            'payment_method' => $payment_method,
+            'booking_type' => $booking_type,
+            'id_number' => $id_number,
+            'booking_date' => date('Y-m-d H:i:s'),
+            'status' => 1
+        ];
+        $this->db->insert('bookings', $booking_data);
+        $booking_id = $this->db->insert_id();
+
+        // Insert into room booked dates
+        $room_booked_data = [
+            'customer_id' => $customer_id,
+            'booking_id' => $booking_id,
+            'room_id' => $room_type_id,
+            'book_date' => date('Y-m-d H:i:s'),
+            'check_in' => $check_in,
+            'check_out' => $check_out
+        ];
+        $this->db->insert('room_booked_dates', $room_booked_data);
+
+        // Complete transaction
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            // If there's an error during the transaction
+            $this->session->set_flashdata('error_message', 'An error occurred while saving the booking.');
+        } else {
+            // If transaction is successful
+            $this->session->set_flashdata('success_message', 'Booking successfully created for ' . $customer_name);
+        }
+
+        // Fetch updated bookings data
+        $data['bookings'] = $this->db->select('bookings.*, room_types.name as room_type, customer_info.customer_name')
+            ->from('bookings')
+            ->join('room_types', 'bookings.room_type_id = room_types.id', 'left')
+            ->join('customer_info', 'bookings.customer_id = customer_info.customer_id', 'left')
+            ->order_by('bookings.created_at', 'DESC')
+            ->get()
+            ->result();
+
+        // Load the same view with updated data
+        $this->load->view('manage_booking', $data);
+    }
 
 
 
